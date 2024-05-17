@@ -8,17 +8,26 @@ do
         archiveAndDelete "$file" "$file"
         7z a -tzip -sdel "$file.cbz" "$file";
     else
+
+        if [ 7z l -slt "$file" | grep "Ecrypted = +"]; then
+            # collection might have different pw for each archive so 
+            # so I'm not gonna pass in a pw do deal with all of them
+            echo "Archive is password protected.";
+            break;
+        fi
+
         ext="${file##*.}";
         basename="${file%.*}";
 
         if [ $ext = "rar" ]; then
+            # re-archive into cbz because reader doesn't support cbr
             dirname="temp_$basename";
             7z x "$file" -O"$dirname";
-            archiveAndDelete "$basename" "$dirname"
             7z a -tzip -sdel "$basename.cbz" "$dirname";
         fi
         
         if [ $ext = "zip" ]; then
+            # no need to extract, just rename
             basename="${file%.*}";
             mv "$file" "$basename.cbz";
         fi
