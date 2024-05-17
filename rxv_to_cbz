@@ -2,19 +2,25 @@
 
 for file in *; 
 do
-    ext="${file##*.}";
-    basename="${file%.*}";
 
-    if [ $ext = "rar" ]; then
-        dirname="temp_$basename";
-        7z x "$file" -O"$dirname";
-        7z a -tzip -sdel "$basename.cbz" "$dirname";
-        rm "$file";
-    fi
-    
-    if [ $ext = "zip" ]; then
+    if [ -d "$file" ]; 
+    then
+        archiveAndDelete "$file" "$file"
+        7z a -tzip -sdel "$file.cbz" "$file";
+    else
+        ext="${file##*.}";
         basename="${file%.*}";
-        mv "$file" "$basename.cbz";
-    fi
 
+        if [ $ext = "rar" ]; then
+            dirname="temp_$basename";
+            7z x "$file" -O"$dirname";
+            archiveAndDelete "$basename" "$dirname"
+            7z a -tzip -sdel "$basename.cbz" "$dirname";
+        fi
+        
+        if [ $ext = "zip" ]; then
+            basename="${file%.*}";
+            mv "$file" "$basename.cbz";
+        fi
+    fi
 done
