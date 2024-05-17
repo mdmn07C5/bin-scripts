@@ -1,0 +1,17 @@
+#!/bin/sh
+DIR=`pwd`
+BASE=`basename $DIR`
+OUT="${BASE}_24fps"
+mkdir $OUT
+if [ ! -d $OUT ]; then
+	mkdir $OUT
+fi
+
+for file in *; 
+do
+	if test -f "$file" 
+	then
+		ffmpeg -i "$file" -crf 18 -vf "scale=-1:720, pad=ceil(iw/2)*2:ceil(ih/2)*2" \
+		-bufsize 189k -r 24 "$OUT/$file"
+	fi
+done

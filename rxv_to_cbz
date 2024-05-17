@@ -1,0 +1,20 @@
+#!/bin/bash
+
+for file in *; 
+do
+    ext="${file##*.}";
+    basename="${file%.*}";
+
+    if [ $ext = "rar" ]; then
+        dirname="temp_$basename";
+        7z x "$file" -O"$dirname";
+        7z a -tzip -sdel "$basename.cbz" "$dirname";
+        rm "$file";
+    fi
+    
+    if [ $ext = "zip" ]; then
+        basename="${file%.*}";
+        mv "$file" "$basename.cbz";
+    fi
+
+done

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for file in *; 
+do
+    # default to '_' if no delimiter is supplied
+    f_no_prefix="${file#*${1:-'_'}}";
+    mv "$file" "$f_no_prefix";
+
+done

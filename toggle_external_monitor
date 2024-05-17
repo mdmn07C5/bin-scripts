@@ -1,0 +1,11 @@
+#!/bin/sh
+intern=eDP-1
+extern=HDMI-1-0
+
+if xrandr --listactivemonitors | grep "Monitors: 2"; then
+    if xrandr | grep "$extern disconnected"; then
+        xrandr --output "$extern" --off --output "$intern" --auto
+    else
+        xrandr --output "$intern" --off --output "$extern" --primary
+    fi
+fi
