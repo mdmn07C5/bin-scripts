@@ -1,11 +1,54 @@
-#!/bin/sh
+#!/bin/bash
 intern=eDP-1
-extern=HDMI-1-0
+HDMI=HDMI-1-0
 
-if xrandr --listactivemonitors | grep "Monitors: 2"; then
-    if xrandr | grep "$extern disconnected"; then
-        xrandr --output "$extern" --off --output "$intern" --auto
-    else
-        xrandr --output "$intern" --off --output "$extern" --primary
-    fi
+monitors=$(xrandr --listactivemonitors)
+
+# set IFS to enable splitting by linebreak
+ORIGINAL_IFS=$IFS
+IFS=$'\n'
+
+tmp=($monitors)
+monitor_count=${tmp#*: }
+
+# HDMI is connected
+if [[ $monitor_count != "1" && ${monitors[$i]} =~ $HDMI ]]; then
+    monitors=($monitors)
+    IFS=$ORIGINAL_IFS
+    active_monitors=(${monitors[@]:1})
+
+    # disable all active monitors besides HDMI
+    for (( i=0; i<${#active_monitors[@]}; i++ ))
+    do
+        monitor=(${active_monitors[$i]})
+
+        if [[ ${monitor[-1]} != $HDMI ]]; then
+            xrandr --output ${monitor[-1]} --off
+        fi
+    done
+
+elif [[ $monitor_count == "1" && $monitors != $intern ]]; then
+    connected_monitors=($(xrandr | grep " connected "))
+    IFS=$ORIGINAL_IFS
+    # enable connected all monitors
+    
+    for (( i=0; i<${#connected_monitors[@]}; i++ ))
+    do
+        monitor=(${connected_monitors[$i]})
+    
+        if [[ ${monitor[0]} =~ $intern ]]; then
+            pos_of="--left-of"
+        else
+            pos_of="--right-of"
+        fi
+        
+        xrandr --output ${monitor[0]} --auto $pos_of $HDMI
+    done
+else
+    zenity \
+    --info \
+    --text="<span size=\"xx-large\">External monitor not connected.</span>\n\nConnect a display to HDMI port." \
+    --title="Alert" \
+    --ok-label="OK"
 fi
+IFS=$ORIGINAL_IFS
