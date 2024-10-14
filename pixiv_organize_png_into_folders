@@ -1,0 +1,24 @@
+#!/bin/bash
+
+image_extensions="*.png *.jpg *.jpeg *.gif"
+
+# Loop through all PNG files in the directory
+for file in $image_extensions; do
+  
+  if [ "$file" == "*.png" ] || [ "$file" == "*.jpg" ] || [ "$file" == "*.jpeg" ] || 
+     [ "$file" == "*.gif" ] || [ "$file" == "*.bmp" ] || [ "$file" == "*.tiff" ]; then
+    continue
+  fi
+
+
+  # Extract the prefix before the first underscore
+  prefix=$(echo "$file" | cut -d'_' -f1)
+
+  # Create a directory based on the prefix if it doesn't exist
+  if [ ! -d "$prefix" ]; then
+    mkdir "$prefix"
+  fi
+
+  # Move the PNG file into the directory
+  mv "$file" "$prefix"
+done

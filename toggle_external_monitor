@@ -1,10 +1,14 @@
 #!/bin/bash
-intern=eDP-1
-HDMI=HDMI-1-0
 
 monitors=$(xrandr --listactivemonitors)
-
-# set IFS to enable splitting by linebreak
+intern=$(xrandr --listactivemonitors | grep 'eDP')
+intern=${intern##* }
+HDMI=$(xrandr --listactivemonitors | grep 'HDMI')
+HDMI=${HDMI##* }
+# o=${asdf##* }
+# echo $o
+#
+## set IFS to enable splitting by linebreak
 ORIGINAL_IFS=$IFS
 IFS=$'\n'
 
